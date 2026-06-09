@@ -34,13 +34,14 @@ class ConexaoSqlite(ConexaoBanco):
     def nome_banco(self):
         return self._nome_banco
 
-    def conectar(self) -> sqlite3.Connection:
-        try:
-            return sqlite3.connect(self.nome_banco)
-        except sqlite3.Error as erro:
-            raise RuntimeError(f"Erro ao conectar ao banco: {erro}")
-
-    def criar_tabelas(self):
-        with self.connectar() as conexao:
-            with open("sql/schema.sql", "r", encoding="utf-8") as arquivo:
-                conexao.executeescript(arquivo.read())
+    def conectar(self, sql: str):
+        with sqlite3.connect(self._nome_banco) as conexao:
+            with conexao:
+                with conexao.cursor() as cursor:
+                    cursor.execute(sql)
+                    rows = cursor.fetchall()
+                    return rows
+    #    try:
+    #        return sqlite3.connect(self.nome_banco)
+    #    except sqlite3.Error as erro:
+    #        raise RuntimeError(f"Erro ao conectar ao banco: {erro}")
