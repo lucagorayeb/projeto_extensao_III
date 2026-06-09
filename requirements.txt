@@ -1,2 +1,1 @@
 validate_docbr
-flake8
