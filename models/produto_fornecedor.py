@@ -11,8 +11,8 @@ Lincence   : GNU/GPL v3.0
 Use:
 -----------------------------------------------------
 """
-from produto import Produto
-from fornecedor import Fornecedor
+from .produto import Produto
+from .fornecedor import Fornecedor
 
 
 class ProdutoFornecedor:

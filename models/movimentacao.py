@@ -11,9 +11,9 @@ Lincence   : GNU/GPL v3.0
 Use:
 -----------------------------------------------------
 """
-from produto import Produto
-from fornecedor import Fornecedor
-from usuario import Usuario
+from .produto import Produto
+from .fornecedor import Fornecedor
+from .usuario import Usuario
 from enum import Enum
 from datetime import datetime
 

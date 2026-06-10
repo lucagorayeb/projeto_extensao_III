@@ -11,9 +11,6 @@ Lincence   : GNU/GPL v3.0
 Use:
 -----------------------------------------------------
 """
-from fornecedor import Fornecedor
-
-
 class Produto:
     def __init__(self, nome: str,
                  descricao: str,
