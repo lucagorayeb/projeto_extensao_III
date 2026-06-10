@@ -11,7 +11,7 @@ Lincence   : GNU/GPL v3.0
 Use:
 -----------------------------------------------------
 """
-from produto import Produto
+from .produto import Produto
 
 
 class Estoque:

@@ -11,7 +11,7 @@ Lincence   : GNU/GPL v3.0
 Use:
 -----------------------------------------------------
 """
-from validacao_cpf_cnpj import Validadora
+from .validacao_cpf_cnpj import Validadora
 
 
 class Fornecedor:

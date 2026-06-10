@@ -11,8 +11,8 @@ Lincence   : GNU/GPL v3.0
 Use:
 -----------------------------------------------------
 """
-from models.produto import Produto
-from produto_repository import ProdutoRepository
+from models import Produto 
+from repositories import ProdutoRepository
 
 
 produto = Produto(nome="Mouse Gamer",
@@ -23,5 +23,7 @@ produto = Produto(nome="Mouse Gamer",
                   preco_venda=100.0,
                   categoria="Periféricos")
 
-repo = ProdutoRepository()
-repo.salvar()
+repo = ProdutoRepository("banco.sqlite")
+id = 1
+nome = 'Luca'
+repo.salvar(produto)

@@ -34,13 +34,16 @@ class ConexaoSqlite(ConexaoBanco):
     def nome_banco(self):
         return self._nome_banco
 
-    def conectar(self, sql: str):
-        with sqlite3.connect(self._nome_banco) as conexao:
-            with conexao:
-                with conexao.cursor() as cursor:
-                    cursor.execute(sql)
-                    rows = cursor.fetchall()
-                    return rows
+    def conectar(self) -> sqlite3:
+        return sqlite3.connect(self._nome_banco) 
+#        cursor = conexao.cursor() 
+#        cursor.execute(sql)
+#         conexao.commit()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self._nome_banco:
+            self._nome_banco.close()
+        return False
     #    try:
     #        return sqlite3.connect(self.nome_banco)
     #    except sqlite3.Error as erro:
