@@ -46,15 +46,31 @@ class ProdutoRepository:
             )
             con.commit()
 
-    def buscar_por_id(self, id: int):
-        pass
+    def buscar_por_id(self, campos: list[str], id: int) -> str:
+        string = self._gera_campos_do_select(campos)
+        sql = f"SELECT {string} FROM produto WHERE id = {id};"
+        return self. _select_listagem(sql)
 
-    def listar(self, array: str):
-        sql = "SELECT ? FROM produto;"
+    def listar(self, campos: list[str]) -> str:
+        string = self._gera_campos_do_select(campos)
+        sql = f"SELECT {string} FROM produto;"
+        return self. _select_listagem(sql)
+
+    def _gera_campos_do_select(self, campos: list[str]) -> str:
+        string = ''
+        for i in range(len(campos)):
+            string = f"{string} {campos[i]}"
+            if i < len(campos)-1:
+                string = f"{string}, "
+        return string
+
+    def _select_listagem(self, sql: str) -> str:
         with self._conexao.conectar() as con:
             cursor = con.cursor()
-            cursor.execute(sql, array)
+            cursor.execute(sql)
+            resultado = cursor.fetchall()
             con.commit()
+            return resultado
 
     def atualizar(self, produto: Produto):
         pass
