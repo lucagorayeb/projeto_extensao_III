@@ -11,6 +11,8 @@ Lincence   : GNU/GPL v3.0
 Use:
 -----------------------------------------------------
 """
+
+
 class Produto:
     def __init__(self, nome: str,
                  descricao: str,

@@ -31,10 +31,36 @@ produto2 = Produto(nome="Teclado Gamer",
                    preco_venda=120.0,
                    categoria="Periféricos")
 
+produto3 = Produto(
+    nome="Monitor Full HD 24",
+    descricao="Monitor LED 24 polegadas Full HD",
+    codigo_barra="7891234567890",
+    preco_custo=450.0,
+    vendivel=True,
+    preco_venda=699.90,
+    categoria="Monitores"
+)
+
+produto4 = Produto(
+    nome="Mouse Sem Fio",
+    descricao="Mouse óptico sem fio 1600 DPI",
+    codigo_barra="7894561237890",
+    preco_custo=35.0,
+    vendivel=True,
+    preco_venda=59.90,
+    categoria="Periféricos"
+)
+
 repo = ProdutoRepository("banco.sqlite")
 id = 1
 nome = 'Luca'
+
+# repo.salvar(produto)
 # repo.salvar(produto2)
-array = ('nome', 'descricao', 'preco_custo', 'preco_venda')
+# repo.salvar(produto3)
+# repo.salvar(produto4)
+# repo.atualizar(produto3, 3)
+repo.deletar(4)
+array = ('id', 'nome', 'descricao', 'preco_custo', 'preco_venda')
 print(repo.listar(array))
-print(repo.buscar_por_id(array, 1))
+# print(repo.buscar_por_id(array, 1))
