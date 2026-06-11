@@ -13,6 +13,7 @@ Use:
 """
 from .conexao import ConexaoSqlite
 from models.produto import Produto
+import sqlite3
 
 CAMPOS_VALIDOS = {
     "id",
@@ -31,7 +32,7 @@ class ProdutoRepository:
     def __init__(self, conexao: str):
         self._conexao = ConexaoSqlite(conexao)
 
-    def salvar(self, produto: Produto):
+    def salvar(self, produto: Produto) -> int:
         sql = """INSERT INTO produto (
                            nome,
                            descricao,
@@ -44,7 +45,8 @@ class ProdutoRepository:
 
         campos = self._obter_campos_produto(produto)
 
-        self._executar_query_sem_retorno(sql, campos, 0)
+        cursor = self._executar_query(sql, campos)
+        return cursor.lastrowid
 
     def atualizar(self, produto: Produto, id: int) -> int:
         sql = """UPDATE produto
@@ -60,46 +62,43 @@ class ProdutoRepository:
         campos = self._obter_campos_produto(produto)
         campos.append(id)
 
-        return self._executar_query_sem_retorno(sql, campos, 1)
+        cursor = self._executar_query(sql, campos)
+        return cursor.rowcount
 
-    def deletar(self, id: int):
+    def deletar(self, id: int) -> int:
         sql = "DELETE FROM produto WHERE id = ?;"
-        campos = [id]
-        self._executar_query_sem_retorno(sql, campos, 1)
+        cursor = self._executar_query(sql, [id])
+        return cursor.rowcount
 
-    def _executar_query_sem_retorno(self, sql: str,
-                                    campos: list,
-                                    verificador_retorno: int) -> int:
-        with self._conexao.conectar() as con:
-            cursor = con.cursor()
-            cursor.execute(sql, campos)
-            con.commit()
-            if verificador_retorno == 0:
-                return cursor.lastrowid
-            return cursor.rowcount
-
-    def _obter_campos_produto(self, produto: Produto):
-        return [produto.nome,
+    def _obter_campos_produto(self, produto: Produto) -> list:
+        return [
+                produto.nome,
                 produto.descricao,
                 produto.codigo_barra,
                 produto.preco_custo,
                 produto.vendivel,
                 produto.preco_venda,
-                produto.categoria]
+                produto.categoria
+                ]
 
-    def buscar_por_id(self, campos: list[str], id: int) -> Produto | None:
+    def buscar_por_id(self, campos: list[str], id: int) -> list[tuple] | None:
         self._validar_campos(campos)
         string = self._gera_campos_do_select(campos)
-        campos = [string, id]
         sql = f"SELECT {string} FROM produto WHERE id = ?;"
-        return self. _executar_query_com_retorno(sql, campos, 0)
+        cursor = self._executar_query(sql, [id])
+        return cursor.fetchone()
 
-    def listar(self, campos: list[str]) -> Produto:
+    def listar(self, campos: list[str]) -> list[tuple]:
         self._validar_campos(campos)
         string = self._gera_campos_do_select(campos)
-        campos = [string]
         sql = f"SELECT {string} FROM produto;"
-        return self. _executar_query_com_retorno(sql, campos, 1)
+        cursor = self. _executar_query(sql)
+        return cursor.fetchall()
+
+    def _validar_campos(self, campos: list) -> ValueError | None:
+        for campo in campos:
+            if campo not in CAMPOS_VALIDOS:
+                raise ValueError(f"Campo inválido: {campo}")
 
     def _gera_campos_do_select(self, campos: list[str]) -> str:
         string = ''
@@ -109,17 +108,9 @@ class ProdutoRepository:
                 string = f"{string}, "
         return string
 
-    def _executar_query_com_retorno(self, sql: str,
-                                    campos: list[str],
-                                    verificador_retorno: int) -> list[tuple]:
+    def _executar_query(self, sql: str, campos: list = []) -> sqlite3:
         with self._conexao.conectar() as con:
             cursor = con.cursor()
-            cursor.execute(sql)
-            if verificador_retorno == 0:
-                return cursor.fetchone()
-            return cursor.fetchall()
-
-    def _validar_campos(self, campos: list):
-        for campo in campos:
-            if campo not in CAMPOS_VALIDOS:
-                raise ValueError(f"Campo inválido: {campo}")
+            cursor.execute(sql, campos)
+            con.commit()
+            return cursor
