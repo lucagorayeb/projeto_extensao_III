@@ -37,7 +37,7 @@ produto3 = Produto(
     codigo_barra="7891234567890",
     preco_custo=450.0,
     vendivel=True,
-    preco_venda=699.90,
+    preco_venda=799.90,
     categoria="Monitores"
 )
 
@@ -60,7 +60,7 @@ nome = 'Luca'
 # repo.salvar(produto3)
 # repo.salvar(produto4)
 # repo.atualizar(produto3, 3)
-repo.deletar(4)
+# repo.deletar(4)
 array = ('id', 'nome', 'descricao', 'preco_custo', 'preco_venda')
-print(repo.listar(array))
-# print(repo.buscar_por_id(array, 1))
+# print(repo.listar(array))
+print(repo.buscar_por_id(array, 1))
