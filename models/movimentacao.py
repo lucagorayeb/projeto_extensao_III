@@ -25,7 +25,7 @@ class Movimentacao:
                  tipo: TipoMovimentacao,
                  quantidade: int,
                  observacao: str | None,
-                 movimentador: Usuario,
+                 usuario: Usuario,
                  id: int | None = None):
 
         self._produto = produto
@@ -33,7 +33,7 @@ class Movimentacao:
         self._tipo = tipo
         self._quantidade = quantidade
         self._observacao = (observacao.strip() if observacao else None)
-        self._movimentador = movimentador
+        self._usuario = usuario
         self._data_movimentacao = datetime.now()
         self._id = id
 
@@ -52,7 +52,7 @@ class Movimentacao:
                 produto: {self.produto.nome},
                 tipo: {self.tipo.value},
                 quantidade: {self.quantidade},
-                movimentador: {self.movimentador.nome},
+                movimentador: {self.usuario.nome},
                 data: {self.data_movimentacao}
                 )"""
             )
@@ -78,8 +78,8 @@ class Movimentacao:
         return self._observacao
 
     @property
-    def movimentador(self) -> Usuario:
-        return self._movimentador
+    def usuario(self) -> Usuario:
+        return self._usuario
 
     @property
     def id(self) -> int | None:
