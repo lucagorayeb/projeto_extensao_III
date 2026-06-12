@@ -1,3 +1,7 @@
 from .conexao import ConexaoSqlite
 from .produto_repository import ProdutoRepository
-
+from .estoque_repository import EstoqueRepository
+from .produto_fornecedor_repository import ProdutoFornecedorRepository
+from .fornecedor_repository import FornecedorRepository
+from .usuario_repository import UsuarioRepository
+from .movimentacao_repository import MovimentacaoRepository
