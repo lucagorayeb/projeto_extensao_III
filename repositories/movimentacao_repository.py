@@ -1,67 +1,66 @@
 #!/usr/bin/env python
 """
 -----------------------------------------------------
-Program    : produto_repository.py
+Program    : movimentacao_repository.py
 Description:
 Version    : 0.1
 Author     : Luca Gorayeb <lucagorayeb@gmail.com>
-Date       : 09/06/2026
+Date       : 11/06/2026
 Lincence   : GNU/GPL v3.0
 -----------------------------------------------------
 Use:
 -----------------------------------------------------
 """
 from .conexao import ConexaoSqlite
-from models.produto import Produto
+from models.movimentacao import Movimentacao
 from typing import Any
 
 CAMPOS_VALIDOS = {
     "id",
-    "nome",
-    "descricao",
-    "codigo_barra",
-    "preco_custo",
-    "vendivel",
-    "preco_venda",
-    "categoria"
+    "produto_id",
+    "fornecedor_id",
+    "tipo",
+    "quantidade",
+    "observacao",
+    "usuario_id"
 }
 
 
-class ProdutoRepository:
+class MovimentacaoRepository:
 
     def __init__(self, conexao: str):
         self._conexao = ConexaoSqlite(conexao)
 
-    def salvar(self, produto: Produto) -> int:
-        sql = """INSERT INTO produto (
-                           nome,
-                           descricao,
-                           codigo_barra,
-                           preco_custo,
-                           vendivel,
-                           preco_venda,
-                           categoria
-                           ) VALUES (?, ?, ?, ?, ?, ?, ?);"""
+    def salvar(self, movimentacao: Movimentacao) -> int:
+        sql = """INSERT INTO movimentacao (
+                        produto_id,
+                        fornecedor_id,
+                        tipo,
+                        quantidade,
+                        observacao,
+                        usuario_id,
+                        data_movimentacao
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?);"""
 
-        campos = self._obter_campos_produto(produto)
+        campos = self._obter_campos_movimentacao(movimentacao)
         with self._conexao.conectar() as con:
             cursor = con.cursor()
             cursor.execute(sql, campos)
             con.commit()
             return cursor.lastrowid
 
-    def atualizar(self, produto: Produto, id: int) -> int:
-        sql = """UPDATE produto
-                 SET    nome = ?,
-                        descricao = ?,
-                        codigo_barra = ?,
-                        preco_custo = ?,
-                        vendivel = ?,
-                        preco_venda = ?,
-                        categoria = ?
+    def atualizar(self, movimentacao: Movimentacao, id: int) -> int:
+        sql = """UPDATE movimentacao
+                 SET    produto_id = ?,
+                        fornecedor_id = ?,
+                        tipo = ?,
+                        quantidade = ?,
+                        observacao = ?,
+                        usuario_id = ?,
+                        data_movimentacao = ?
                    WHERE
                         id = ?;"""
-        campos = self._obter_campos_produto(produto)
+        campos = self._obter_campos_movimentacao(movimentacao)
         campos.append(id)
         with self._conexao.conectar() as con:
             cursor = con.cursor()
@@ -70,7 +69,7 @@ class ProdutoRepository:
             return cursor.rowcount
 
     def deletar(self, id: int) -> int:
-        sql = "DELETE FROM produto WHERE id = ?;"
+        sql = "DELETE FROM movimentacao WHERE id = ?;"
         with self._conexao.conectar() as con:
             cursor = con.cursor()
             cursor.execute(sql, (id,))
@@ -80,7 +79,7 @@ class ProdutoRepository:
     def buscar_por_id(self, campos: list[str], id: int) -> tuple | None:
         self._validar_campos(campos)
         string = self._gera_campos_do_select(campos)
-        sql = f"SELECT {string} FROM produto WHERE id = ?;"
+        sql = f"SELECT {string} FROM movimentacao WHERE id = ?;"
         with self._conexao.conectar() as con:
             cursor = con.cursor()
             cursor.execute(sql, (id,))
@@ -89,7 +88,7 @@ class ProdutoRepository:
     def listar(self, campos: list[str]) -> list[tuple]:
         self._validar_campos(campos)
         string = self._gera_campos_do_select(campos)
-        sql = f"SELECT {string} FROM produto;"
+        sql = f"SELECT {string} FROM movimentacao;"
 
         with self._conexao.conectar() as con:
             cursor = con.cursor()
@@ -109,13 +108,14 @@ class ProdutoRepository:
                 string = f"{string}, "
         return string
 
-    def _obter_campos_produto(self, produto: Produto) -> list[Any]:
+    def _obter_campos_movimentacao(self,
+                                   movimentacao: Movimentacao) -> list[Any]:
         return [
-                produto.nome,
-                produto.descricao,
-                produto.codigo_barra,
-                produto.preco_custo,
-                produto.vendivel,
-                produto.preco_venda,
-                produto.categoria
-                ]
+                movimentacao.produto.id,
+                movimentacao.fornecedor.id
+                if movimentacao.fornecedor else None,
+                movimentacao.tipo.value,
+                movimentacao.quantidade,
+                movimentacao.observacao,
+                movimentacao.usuario.id
+            ]

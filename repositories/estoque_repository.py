@@ -1,67 +1,58 @@
 #!/usr/bin/env python
 """
 -----------------------------------------------------
-Program    : produto_repository.py
+Program    : estoque_repository.py
 Description:
 Version    : 0.1
 Author     : Luca Gorayeb <lucagorayeb@gmail.com>
-Date       : 09/06/2026
+Date       : 11/06/2026
 Lincence   : GNU/GPL v3.0
 -----------------------------------------------------
 Use:
 -----------------------------------------------------
 """
 from .conexao import ConexaoSqlite
-from models.produto import Produto
+from models.estoque import Estoque
 from typing import Any
 
 CAMPOS_VALIDOS = {
     "id",
-    "nome",
-    "descricao",
-    "codigo_barra",
-    "preco_custo",
-    "vendivel",
-    "preco_venda",
-    "categoria"
+    "produto_id",
+    "quantidade",
+    "quantidade_minima",
+    "localizacao"
 }
 
 
-class ProdutoRepository:
+class EstoqueRepository:
 
     def __init__(self, conexao: str):
         self._conexao = ConexaoSqlite(conexao)
 
-    def salvar(self, produto: Produto) -> int:
-        sql = """INSERT INTO produto (
-                           nome,
-                           descricao,
-                           codigo_barra,
-                           preco_custo,
-                           vendivel,
-                           preco_venda,
-                           categoria
-                           ) VALUES (?, ?, ?, ?, ?, ?, ?);"""
+    def salvar(self, estoque: Estoque) -> int:
+        sql = """INSERT INTO estoque (
+                           produto_id,
+                           quantidade,
+                           quantidade_minima,
+                           localizacao
+                           ) VALUES (?, ?, ?, ?);"""
 
-        campos = self._obter_campos_produto(produto)
+        campos = self._obter_campos_estoque(estoque)
         with self._conexao.conectar() as con:
             cursor = con.cursor()
             cursor.execute(sql, campos)
             con.commit()
             return cursor.lastrowid
 
-    def atualizar(self, produto: Produto, id: int) -> int:
-        sql = """UPDATE produto
-                 SET    nome = ?,
-                        descricao = ?,
-                        codigo_barra = ?,
-                        preco_custo = ?,
-                        vendivel = ?,
-                        preco_venda = ?,
-                        categoria = ?
+    def atualizar(self, estoque: Estoque, id: int) -> int:
+        sql = """UPDATE estoque
+                 SET    produto_id = ?,
+                        quantidade = ?,
+                        quantidade_minima = ?,
+                        localizacao = ?
                    WHERE
                         id = ?;"""
-        campos = self._obter_campos_produto(produto)
+        campos = self._obter_campos_estoque(estoque)
         campos.append(id)
         with self._conexao.conectar() as con:
             cursor = con.cursor()
@@ -70,7 +61,7 @@ class ProdutoRepository:
             return cursor.rowcount
 
     def deletar(self, id: int) -> int:
-        sql = "DELETE FROM produto WHERE id = ?;"
+        sql = "DELETE FROM estoque WHERE id = ?;"
         with self._conexao.conectar() as con:
             cursor = con.cursor()
             cursor.execute(sql, (id,))
@@ -80,7 +71,7 @@ class ProdutoRepository:
     def buscar_por_id(self, campos: list[str], id: int) -> tuple | None:
         self._validar_campos(campos)
         string = self._gera_campos_do_select(campos)
-        sql = f"SELECT {string} FROM produto WHERE id = ?;"
+        sql = f"SELECT {string} FROM estoque WHERE id = ?;"
         with self._conexao.conectar() as con:
             cursor = con.cursor()
             cursor.execute(sql, (id,))
@@ -89,7 +80,7 @@ class ProdutoRepository:
     def listar(self, campos: list[str]) -> list[tuple]:
         self._validar_campos(campos)
         string = self._gera_campos_do_select(campos)
-        sql = f"SELECT {string} FROM produto;"
+        sql = f"SELECT {string} FROM estoque;"
 
         with self._conexao.conectar() as con:
             cursor = con.cursor()
@@ -109,13 +100,10 @@ class ProdutoRepository:
                 string = f"{string}, "
         return string
 
-    def _obter_campos_produto(self, produto: Produto) -> list[Any]:
+    def _obter_campos_estoque(self, estoque: Estoque) -> list[Any]:
         return [
-                produto.nome,
-                produto.descricao,
-                produto.codigo_barra,
-                produto.preco_custo,
-                produto.vendivel,
-                produto.preco_venda,
-                produto.categoria
+                estoque.produto.id,
+                estoque.quantidade,
+                estoque.quantidade_minima,
+                estoque.localizacao
                 ]

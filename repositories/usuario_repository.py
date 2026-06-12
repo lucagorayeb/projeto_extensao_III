@@ -1,67 +1,49 @@
 #!/usr/bin/env python
 """
 -----------------------------------------------------
-Program    : produto_repository.py
+Program    : usuario_repository.py
 Description:
 Version    : 0.1
 Author     : Luca Gorayeb <lucagorayeb@gmail.com>
-Date       : 09/06/2026
+Date       : 11/06/2026
 Lincence   : GNU/GPL v3.0
 -----------------------------------------------------
 Use:
 -----------------------------------------------------
 """
 from .conexao import ConexaoSqlite
-from models.produto import Produto
+from models.usuario import Usuario
 from typing import Any
 
 CAMPOS_VALIDOS = {
     "id",
-    "nome",
-    "descricao",
-    "codigo_barra",
-    "preco_custo",
-    "vendivel",
-    "preco_venda",
-    "categoria"
+    "nome"
 }
 
 
-class ProdutoRepository:
+class UsuarioRepository:
 
     def __init__(self, conexao: str):
         self._conexao = ConexaoSqlite(conexao)
 
-    def salvar(self, produto: Produto) -> int:
-        sql = """INSERT INTO produto (
-                           nome,
-                           descricao,
-                           codigo_barra,
-                           preco_custo,
-                           vendivel,
-                           preco_venda,
-                           categoria
-                           ) VALUES (?, ?, ?, ?, ?, ?, ?);"""
+    def salvar(self, usuario: Usuario) -> int:
+        sql = """INSERT INTO usuario (
+                           nome
+                           ) VALUES (?);"""
 
-        campos = self._obter_campos_produto(produto)
+        campos = self._obter_campos_usuario(usuario)
         with self._conexao.conectar() as con:
             cursor = con.cursor()
             cursor.execute(sql, campos)
             con.commit()
             return cursor.lastrowid
 
-    def atualizar(self, produto: Produto, id: int) -> int:
-        sql = """UPDATE produto
-                 SET    nome = ?,
-                        descricao = ?,
-                        codigo_barra = ?,
-                        preco_custo = ?,
-                        vendivel = ?,
-                        preco_venda = ?,
-                        categoria = ?
+    def atualizar(self, usuario: Usuario, id: int) -> int:
+        sql = """UPDATE usuario
+                 SET    nome = ?
                    WHERE
                         id = ?;"""
-        campos = self._obter_campos_produto(produto)
+        campos = self._obter_campos_usuario(usuario)
         campos.append(id)
         with self._conexao.conectar() as con:
             cursor = con.cursor()
@@ -70,7 +52,7 @@ class ProdutoRepository:
             return cursor.rowcount
 
     def deletar(self, id: int) -> int:
-        sql = "DELETE FROM produto WHERE id = ?;"
+        sql = "DELETE FROM usuario WHERE id = ?;"
         with self._conexao.conectar() as con:
             cursor = con.cursor()
             cursor.execute(sql, (id,))
@@ -80,7 +62,7 @@ class ProdutoRepository:
     def buscar_por_id(self, campos: list[str], id: int) -> tuple | None:
         self._validar_campos(campos)
         string = self._gera_campos_do_select(campos)
-        sql = f"SELECT {string} FROM produto WHERE id = ?;"
+        sql = f"SELECT {string} FROM usuario WHERE id = ?;"
         with self._conexao.conectar() as con:
             cursor = con.cursor()
             cursor.execute(sql, (id,))
@@ -89,7 +71,7 @@ class ProdutoRepository:
     def listar(self, campos: list[str]) -> list[tuple]:
         self._validar_campos(campos)
         string = self._gera_campos_do_select(campos)
-        sql = f"SELECT {string} FROM produto;"
+        sql = f"SELECT {string} FROM usuario;"
 
         with self._conexao.conectar() as con:
             cursor = con.cursor()
@@ -109,13 +91,7 @@ class ProdutoRepository:
                 string = f"{string}, "
         return string
 
-    def _obter_campos_produto(self, produto: Produto) -> list[Any]:
+    def _obter_campos_usuario(self, usuario: Usuario) -> list[Any]:
         return [
-                produto.nome,
-                produto.descricao,
-                produto.codigo_barra,
-                produto.preco_custo,
-                produto.vendivel,
-                produto.preco_venda,
-                produto.categoria
+                usuario.nome,
                 ]
