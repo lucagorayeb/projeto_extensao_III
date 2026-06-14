@@ -43,6 +43,8 @@ class MovimentacaoRepository:
                         ) VALUES (?, ?, ?, ?, ?, ?, ?);"""
 
         campos = self._obter_campos_movimentacao(movimentacao)
+        print(campos)
+        print(len(campos))
         with self._conexao.conectar() as con:
             cursor = con.cursor()
             cursor.execute(sql, campos)
@@ -111,11 +113,12 @@ class MovimentacaoRepository:
     def _obter_campos_movimentacao(self,
                                    movimentacao: Movimentacao) -> list[Any]:
         return [
-                movimentacao.produto.id,
-                movimentacao.fornecedor.id
+                movimentacao.produto,
+                movimentacao.fornecedor
                 if movimentacao.fornecedor else None,
                 movimentacao.tipo.value,
                 movimentacao.quantidade,
                 movimentacao.observacao,
-                movimentacao.usuario.id
+                movimentacao.usuario,
+                str(movimentacao.data_movimentacao)
             ]

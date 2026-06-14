@@ -35,16 +35,11 @@ class ConexaoSqlite(ConexaoBanco):
         return self._nome_banco
 
     def conectar(self) -> sqlite3:
-        return sqlite3.connect(self._nome_banco) 
-#        cursor = conexao.cursor() 
-#        cursor.execute(sql)
-#         conexao.commit()
+        con = sqlite3.connect(self._nome_banco)
+        con.execute("PRAGMA foreign_keys = ON")
+        return con 
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self._nome_banco:
             self._nome_banco.close()
         return False
-    #    try:
-    #        return sqlite3.connect(self.nome_banco)
-    #    except sqlite3.Error as erro:
-    #        raise RuntimeError(f"Erro ao conectar ao banco: {erro}")
