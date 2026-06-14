@@ -1,0 +1,6 @@
+from .produto_fornecedor_service import ProdutoFornecedorService
+from .estoque_service import EstoqueService
+from .fornecedor_service import FornecedorService
+from .movimentacao_service import MovimentacaoService
+from .produto_service import ProdutoService
+from .usuario_service import UsuarioService
