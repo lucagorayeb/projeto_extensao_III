@@ -34,7 +34,7 @@ class Movimentacao:
         self._quantidade = quantidade
         self._observacao = (observacao.strip() if observacao else None)
         self._usuario = usuario
-        self._data_movimentacao = datetime.now()
+        self._data_movimentacao = datetime.now().date()
         self._id = id
 
         if quantidade <= 0:
@@ -49,10 +49,12 @@ class Movimentacao:
     def __str__(self):
         return (
                 f"""Movimentação(
-                produto: {self.produto.nome},
+                produto: {self.produto},
+                fornecedor: {self.produto},
                 tipo: {self.tipo.value},
                 quantidade: {self.quantidade},
-                movimentador: {self.usuario.nome},
+                observacao: {self.observacao},
+                usuario: {self.usuario},
                 data: {self.data_movimentacao}
                 )"""
             )
@@ -92,5 +94,5 @@ class Movimentacao:
 
 class TipoMovimentacao(Enum):
     ENTRADA = "entrada"
-    SAIDA = "saída"
+    SAIDA = "saida"
     AJUSTE = "ajuste"
