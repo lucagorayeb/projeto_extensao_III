@@ -48,7 +48,9 @@ class ProdutoRepository:
             cursor = con.cursor()
             cursor.execute(sql, campos)
             con.commit()
-            return cursor.lastrowid
+            row_count = cursor.rowcount
+        self.define_produto_id(produto)
+        return row_count
 
     def atualizar(self, produto: Produto, id: int) -> int:
         sql = """UPDATE produto
@@ -119,3 +121,11 @@ class ProdutoRepository:
                 produto.preco_venda,
                 produto.categoria
                 ]
+
+    def define_produto_id(self, produto: Produto) -> None:
+        sql = f"SELECT id FROM produto WHERE nome = '{produto.nome}';"
+        with self._conexao.conectar() as con:
+            cursor = con.cursor()
+            cursor.execute(sql)
+            id_produto = cursor.fetchall()
+        produto.alterar_id(id_produto)
