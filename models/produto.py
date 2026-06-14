@@ -11,8 +11,6 @@ Lincence   : GNU/GPL v3.0
 Use:
 -----------------------------------------------------
 """
-
-
 class Produto:
     def __init__(self, nome: str,
                  descricao: str,
@@ -66,6 +64,9 @@ class Produto:
     @property
     def id(self) -> int | None:
         return self._id
+    
+    def alterar_id(self, novo_id: int):
+        self._id = novo_id
 
     @property
     def nome(self) -> str:
@@ -98,7 +99,7 @@ class Produto:
     def alterar_preco_venda(self, novo_preco: float):
         if not self._vendivel:
             raise ValueError("""Produtos não vendiveis não
-                             podem ter preço de venda.""")
+                              podem ter preço de venda.""")
 
         if novo_preco < self.preco_custo:
             raise ValueError("""Preço de venda não pode ser
@@ -113,10 +114,6 @@ class Produto:
     def alterar_categoria(self, nova_categoria: str):
         self._verifica_se_string_esta_vazia(nova_categoria)
         self._categoria = nova_categoria
-
-    @property
-    def fornecedor(self) -> Fornecedor:
-        return self._fornecedor
 
     def _verifica_se_string_esta_vazia(self, string: str):
         if not string.strip():
