@@ -1,22 +1,21 @@
-#!/usr/bin/env python
+
 """
 -----------------------------------------------------
 Program    : conexao.py
 Description: Essa é a interface de conexão base
              para o banco de dados. Conforme o
-             conforme a necessidade mais conexões
-             seram adicionadas.
+             conforme a necessidade de mais conexões
+             serão adicionadas.
 Version    : 0.1
 Author     : Luca Gorayeb <lucagorayeb@gmail.com>
 Date       : 04/06/2026
-Lincence   : GNU/GPL v3.0
+Licence   : GNU/GPL v3.0
 -----------------------------------------------------
 Use:
 -----------------------------------------------------
 """
 from abc import ABC, abstractmethod
 import sqlite3
-
 
 class ConexaoBanco(ABC):
 
@@ -34,7 +33,7 @@ class ConexaoSqlite(ConexaoBanco):
     def nome_banco(self):
         return self._nome_banco
 
-    def conectar(self) -> sqlite3:
+    def conectar(self):
         con = sqlite3.connect(self._nome_banco)
         con.execute("PRAGMA foreign_keys = ON")
         return con 
