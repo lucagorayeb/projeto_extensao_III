@@ -1,0 +1,4 @@
+FROM postgres:18.2-alpine3.22 AS BASE
+
+WORKDIR /var/lib/postgresql/data
+

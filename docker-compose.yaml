@@ -1,0 +1,44 @@
+services:
+  backend-python:
+    stdin_open: true
+    tty: true
+    build:
+      context: ./
+      dockerfile: ./Dockerfile_python
+    init: true
+    networks:
+      - backend
+    ports:
+      - "8193:8193"
+    depends_on:
+      database:
+        condition: service_healthy
+        restart: true
+    volumes:
+      - .:/app
+
+  database:
+    image: postgres:18.2-alpine3.22
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: "${POSTGRES_DB}"
+    ports:
+      - "5436:5432"
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    networks:
+      - backend
+
+volumes:
+  pgdata:
+
+networks:
+  backend:
