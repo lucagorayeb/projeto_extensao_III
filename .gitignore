@@ -3,3 +3,4 @@ __pycache__
 banco.sqlite
 estoque.sqlite
 .env
+.idea/
