@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 """
 -----------------------------------------------------
 Program    : produto_controller.py
@@ -6,72 +6,53 @@ Description:
 Version    : 0.1
 Author     : Luca Gorayeb <lucagorayeb@gmail.com>
 Date       : 13/06/2026
-Lincence   : GNU/GPL v3.0
+Licence   : GNU/GPL v3.0
 -----------------------------------------------------
 Use:
 -----------------------------------------------------
 """
-from fastapi import APIRouter
 from services.produto_service import ProdutoService
-from api.dto.produto_request import ProdutoRequest
+from dto.produto_request import ProdutoRequest
 from models.produto import Produto
-
-router = APIRouter(
-    prefix="/produtos",
-    tags=["Produtos"]
-)
 
 produto_service = ProdutoService()
 
-@router.get("/")
-def listar_produtos():
-    return produto_service.listar_produto()
+class ProdutoController:
+    def __init__(self) -> None:
+        self._produto_service = ProdutoService()
 
-@router.get("/{id_produto}")
-def buscar_produto(id_produto: int):
-    return produto_service.buscar_produto(id_produto)
+    def listar_produtos(self)  -> None:
+        return self._produto_service.listar_produto()
 
-@router.post("/")
-def cadastrar_produto(dados: ProdutoRequest):
-    produto = Produto(
-        nome = dados.nome,
-        descricao = dados.descricao,
-        codigo_barra = dados.codigo_barra,
-        preco_custo = dados.preco_custo,
-        vendivel = dados.vendivel,
-        preco_venda = dados.preco_venda,
-        categoria = dados.categoria
-    )
+    def buscar_produto(self, id_produto: int):
+        return self._produto_service.buscar_produto(id_produto)
 
-    id_produto = produto_service.cadastrar_produto(produto)
+    def cadastrar_produto(self, dados: ProdutoRequest) -> None:
+        produto = Produto(
+            nome = dados.nome,
+            descricao = dados.descricao,
+            codigo_barra = dados.codigo_barra,
+            preco_custo = dados.preco_custo,
+            vendivel = dados.vendivel,
+            preco_venda = dados.preco_venda,
+            categoria = dados.categoria
+        )
 
-    return {
-        "id": id_produto,
-        "mensagem": "Produto cadastrado"
-    }
+        self._produto_service.cadastrar_produto(produto)
 
-@router.put("/{id_produto}")
-def atualizar_produto(dados: ProdutoRequest, id_produto: int):
-    produto = Produto(
-        nome = dados.nome,
-        descricao = dados.descricao,
-        codigo_barra = dados.codigo_barra,
-        preco_custo = dados.preco_custo,
-        vendivel = dados.vendivel,
-        preco_venda = dados.preco_venda,
-        categoria = dados.categoria
-    )
+    def atualizar_produto(self, dados: ProdutoRequest, id_produto: int) -> None:
+        produto = Produto(
+            nome = dados.nome,
+            descricao = dados.descricao,
+            codigo_barra = dados.codigo_barra,
+            preco_custo = dados.preco_custo,
+            vendivel = dados.vendivel,
+            preco_venda = dados.preco_venda,
+            categoria = dados.categoria
+        )
 
-    produto_service.atualizar_produto(produto, id_produto)
+        self._produto_service.atualizar_produto(produto, id_produto)
 
-    return {
-        "mensagem": "Produto atualizado"
-    }
-
-@router.delete("/{id_produto}")
-def deletar_produto(id_produto: int):
-    produto_service.deletar_produto(id_produto)
-    return{
-        "mensagem": "Produto deletado"
-    }
+    def deletar_produto(self, id_produto: int) -> None:
+        self._produto_service.deletar_produto(id_produto)
 

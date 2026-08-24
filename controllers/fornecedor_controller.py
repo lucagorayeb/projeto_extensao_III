@@ -13,7 +13,7 @@ Use:
 """
 from fastapi import APIRouter
 from services.fornecedor_service import FornecedorService
-from api.dto.fornecedor_request import FornecedorRequest
+from dto.fornecedor_request import FornecedorRequest
 from models.fornecedor import Fornecedor
 
 router = APIRouter(
