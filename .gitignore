@@ -1,5 +1,4 @@
 .venv
 __pycache__
-banco.sqlite
-estoque.sqlite
 .env
+.idea/
