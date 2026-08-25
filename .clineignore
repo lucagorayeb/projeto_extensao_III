@@ -1,0 +1,6 @@
+# Protect Secrets
+.env
+.env.*
+.git/
+requirements.txt
+Makefile

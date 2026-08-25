@@ -1,0 +1,24 @@
+# Safety Guidelines for AI Agent
+
+## Terminal Command Limits
+- Never install packages/dependencies.
+- Never remove/delete files.
+- Ask before execute any command.
+
+## Code Modification Rules
+- Do NOT edit files inside `vendor/` or `node_modules/`.
+- Never updates the database.
+- Never alter existing migrations that have already run.
+- Keep validation logic strict inside Laravel Form Requests, not raw controllers.
+- Never modify files unless explicitly authorized.
+- Never delete files.
+- Never change configuration files without asking first.
+- Never modify .env or secrets.
+- Never change Git configuration.
+- Never perform destructive operations.
+- If requirements are ambiguous, ask instead of guessing.
+- Make the smallest possible change.
+- Don't refactor unrelated code.
+- Don't change working code just for style.
+- Never modify unrelated files to resolve an error.
+First identify the root cause and explain which file needs to change.
