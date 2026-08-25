@@ -47,6 +47,12 @@ CREATE TABLE IF NOT EXISTS member(
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS function(
+    function_id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    function_name VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS supplier(
     supplier_id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     supplier_name VARCHAR(50) NOT NULL,
@@ -116,7 +122,7 @@ CREATE TABLE IF NOT EXISTS movement(
     movement_fk_product_id INT NOT NULL REFERENCES product(product_id),
     movement_fk_supplier_id INT NOT NULL REFERENCES supplier(supplier_id),
     movement_type MOVEMENT_TYPE NOT NULL,
-    movement_quantidade INT NOT NULL,
+    movement_quantity INT NOT NULL,
     movement_fk_id_member INT NOT NULL REFERENCES member(member_id),
     movement_fk_id_user INT NOT NULL REFERENCES users(user_id),
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
