@@ -1,11 +1,41 @@
+-- Function to update de column update_at
+CREATE FUNCTION trigger_set_timestamp()
+RETURNS TRIGGER as $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+    END;
+$$ language plpgsql;
+
+-- Loop to trigger the function above in all tables
+DO $$
+DECLARE
+    t text;
+BEGIN
+    FOR t IN
+        SELECT table_name
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+            AND column_name = 'updated_at'
+            AND table_name NOT LIKE 'pq_%'
+    LOOP
+        EXECUTE format('DROP TRIGGER IF EXISTS set_timestamp ON %I;', t);
+        EXECUTE format('CREATE TRIGGER set_timestamp BEFORE UPDATE ON %I FOR EACH ROW EXECUTE FUNCTION trigger_set_timestamp();', t);
+    END LOOP;
+END;
+$$;
+
+-- Setting the local timezone
 SET TIME ZONE 'America/Porto_Velho';
 
 CREATE TABLE IF NOT EXISTS users(
     user_id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
 	user_email VARCHAR(50) unique NOT NULL,
     user_password VARCHAR(255) NOT NULL,
+    user_fk_member INT NOT NULL REFERENCES member(member_id),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+
 );
 
 CREATE TABLE IF NOT EXISTS member(
@@ -15,6 +45,12 @@ CREATE TABLE IF NOT EXISTS member(
     member_function INT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS function(
+    function_id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    function_name VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS supplier(
@@ -43,8 +79,8 @@ CREATE TABLE IF NOT EXISTS address(
 
 CREATE TABLE IF NOT EXISTS supplier_address(
     supplier_address_id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    supplier_address_id_supplier INT NOT NULL,
-    supplier_address_id_address INT NOT NULL,
+    supplier_address_fk_id_supplier INT NOT NULL REFERENCES supplier(supplier_id),
+    supplier_address_fk_id_address INT NOT NULL REFERENCES address(address_id),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
@@ -54,9 +90,9 @@ CREATE TABLE IF NOT EXISTS product(
     product_name VARCHAR(50) NOT NULL,
     product_description VARCHAR(255) NOT NULL,
     product_code_bar VARCHAR(50) NOT NULL unique,
-    product_buy_price float NOT NULL,
-    product_for_sale boolean NOT NULL,
-    product_sale_price float,
+    product_buy_price FLOAT NOT NULL,
+    product_for_sale BOOLEAN NOT NULL,
+    product_sale_price FLOAT,
     product_category INT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
@@ -64,35 +100,38 @@ CREATE TABLE IF NOT EXISTS product(
 
 CREATE TABLE IF NOT EXISTS product_supplier(
     product_supplier_id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    product_supplier_id_product INT NOT NULL,
-    product_supplier_id_supplier INT NOT NULL,
+    product_supplier_fk_id_product INT NOT NULL REFERENCES product(product_id),
+    product_supplier_fk_id_supplier INT NOT NULL REFERENCES supplier(supplier_id),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    FOREIGN KEY(produto_id) REFERENCES produto(id),
-    FOREIGN KEY(fornecedor_id) REFERENCES fornecedor(id),
-    unique(produto_id, fornecedor_id)
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS storage(
     storage_id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    storage_product_id INT NOT NULL,
+    storage_fk_id_product INT NOT NULL REFERENCES product(product_id),
     storage_quantity INT NOT NULL,
     storage_minimal_quantity INT NOT NULL,
     storage_blade VARCHAR(50) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    FOREIGN KEY(produto_id) REFERENCES produto(id)
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
+CREATE TYPE movement_type AS ENUM('IN', 'OUT', 'ADJUSTMENTS');
 CREATE TABLE IF NOT EXISTS movement(
-    movement_id SERIAL,
-    movement_product_id INT NOT NULL,
-    movement_fornecedor_id INT,
-    movement_type VARCHAR NOT NULL CHECK(tipo IN ('entrada','saida','ajuste')),
-    movement_quantidade INT NOT NULL,
-    movement_usuario_id INT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    FOREIGN KEY(produto_id) REFERENCES produto(id),
-    FOREIGN KEY(fornecedor_id) REFERENCES fornecedor(id),
-    FOREIGN KEY(usuario_id) REFERENCES usuario(id)
+    movement_id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    movement_fk_product_id INT NOT NULL REFERENCES product(product_id),
+    movement_fk_supplier_id INT NOT NULL REFERENCES supplier(supplier_id),
+    movement_type MOVEMENT_TYPE NOT NULL,
+    movement_quantity INT NOT NULL,
+    movement_fk_id_member INT NOT NULL REFERENCES member(member_id),
+    movement_fk_id_user INT NOT NULL REFERENCES users(user_id),
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS logs(
+    log_id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    log_fk_id_member INT NOT NULL REFERENCES member(member_id),
+    log_fk_id_user INT NOT NULL REFERENCES users(user_id),
+    log_action VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
